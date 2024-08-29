@@ -51,8 +51,12 @@ app.post('/search', upload.single('image'), async (req, res) => {
 
         const result = await client.graphql.get()
             .withClassName('ImageSearch')
-            .withFields(['image', 'text'])
-            .withNearImage({ image: b64Image })
+            .withFields(['image', 'text','_additional { distance }'])
+            .withNearImage({ 
+                image: b64Image,
+                distance:0.25
+
+             })
             .withLimit(limit)
             .withOffset(offset)
             .do();
@@ -60,10 +64,11 @@ app.post('/search', upload.single('image'), async (req, res) => {
         if (result.data.Get.ImageSearch.length === 0) {
             return res.status(404).send('No similar images found.');
         }
-
+        console.log(result.data.Get.ImageSearch[0])
         const images = result.data.Get.ImageSearch.map(image => ({
             image: image.image,
-            text: image.text
+            text: image.text,
+            distance:image._additional.distance,
         }));
 
         res.json(images);

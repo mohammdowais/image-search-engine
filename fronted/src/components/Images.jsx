@@ -8,10 +8,10 @@ const Images = ({results}) => {
         <img
           src={`data:image/jpeg;base64,${result.image}`}
           alt={result.text}
-          className="w-64 h-64 object-cover rounded-lg shadow-md transform hover:scale-105 animate-fade-up"
-          title={result.text}
+          className="w-64 h-64 object-cover rounded-lg shadow-md transform hover:scale-105 animate-fade-up animate-once animate-duration-1000 animate-delay-500 animate-ease-linear"
+          title={result.name}
         />
-        <p className="mt-2 text-center text-slate-200">{result.text}</p>
+        <p className="mt-2 text-center text-slate-200">{result.text} ({result.distance})</p>
       </div>
     ))}
   </div>
