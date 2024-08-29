@@ -4,6 +4,7 @@ import cors from 'cors';
 import { client } from './utils/db.js';
 import { populateDatabase } from './helpers/populateDB.js'; 
 import {schemaConfig} from './helpers/schema.js'
+import { encodeImage } from './helpers/encodeImage.js';
 
 const app = express();
 app.use(cors());
@@ -12,11 +13,6 @@ const PORT = 3000;
 
 // Multer setup for image upload handling
 const upload = multer({ storage: memoryStorage() });
-
-// Helper function to base64 encode image
-const encodeImage = (buffer) => {
-    return Buffer.from(buffer).toString('base64');
-};
 
 
 // Function to check if the schema exists and create it if it doesn't
@@ -49,12 +45,16 @@ const ensureDatabasePopulated = async () => {
 app.post('/search', upload.single('image'), async (req, res) => {
     try {
         const b64Image = encodeImage(req.file.buffer);
+        const { page = 1 } = req.body; // Get the page number from the request body, default to 1
+        const limit = 3; // Number of images to return per page
+        const offset = (page - 1) * limit;
 
         const result = await client.graphql.get()
             .withClassName('ImageSearch')
             .withFields(['image', 'text'])
             .withNearImage({ image: b64Image })
-            .withLimit(9)
+            .withLimit(limit)
+            .withOffset(offset)
             .do();
 
         if (result.data.Get.ImageSearch.length === 0) {
