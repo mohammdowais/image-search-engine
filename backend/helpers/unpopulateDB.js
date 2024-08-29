@@ -10,7 +10,7 @@ await client.batch
   .do();
 const res = await client.graphql.get()
   .withClassName('ImageSearch')
-  .withFields(['text']) // Specify the fields you want to retrieve
+  .withFields(['text']) 
   .do();
 
 console.log(res.data.Get.ImageSearch);

@@ -6,7 +6,7 @@ const FileInput = ({handleImageChange,setSelectedImage}) => {
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
-    handleImageChange(e)
+    handleImageChange(file)
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
@@ -24,6 +24,8 @@ const FileInput = ({handleImageChange,setSelectedImage}) => {
       const reader = new FileReader();
       reader.onloadend = () => {
         setPreview(reader.result);
+        setSelectedImage(true);
+        handleImageChange(file)
       };
       reader.readAsDataURL(file);
     }

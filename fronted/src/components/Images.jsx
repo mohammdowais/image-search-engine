@@ -8,7 +8,7 @@ const Images = ({results}) => {
         <img
           src={`data:image/jpeg;base64,${result.image}`}
           alt={result.text}
-          className="w-64 h-64 object-cover rounded-lg shadow-md transform hover:scale-105 transition-transform duration-300"
+          className="w-64 h-64 object-cover rounded-lg shadow-md transform hover:scale-105 animate-fade-up"
           title={result.text}
         />
         <p className="mt-2 text-center text-slate-200">{result.text}</p>

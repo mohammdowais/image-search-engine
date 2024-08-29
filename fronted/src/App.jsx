@@ -9,8 +9,8 @@ function App() {
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const handleImageChange = (event) => {
-    setSelectedImage(event.target.files[0]);
+  const handleImageChange = (file) => {
+    setSelectedImage(file);
     setResults([]); // Clear previous results
   };
 
