@@ -29,3 +29,9 @@ All commands are run from the `/frontend` folder of the project, from a terminal
 | :--------------------- | :----------------------------------------------- |
 | `npm install`          | Installs dependencies                            |
 | `npm run dev`          | Starts the react app      |
+
+
+## Helpers
+`cd backend/helpers`
+`node unpopulateDB.js`
+Then change images in `/images` folder with new ones and restart the server images will be populated again for image search
