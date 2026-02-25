@@ -1,3 +1,4 @@
+import 'dotenv/config';
 // import { readFileSync, readdirSync } from 'fs';
 // import { join } from 'path';
 // import { client } from '../utils/db.js';
@@ -193,7 +194,8 @@ const getAllFiles = (dir) => {
 };
 
 export const populateDatabase = async () => {
-    const imageDir = 'D:\\owais\\freelance\\ipics-image-search\\images\\Training_photos';
+    console.log("Image path:",process.env.IMAGE_SMALL)
+    const imageDir = process.env.IMAGE_SMALL;
     const files = getAllFiles(imageDir);
 
     const CONCURRENCY = 5;
@@ -289,3 +291,5 @@ export const populateDatabase = async () => {
         next();
     });
 };
+
+// Populate version 2.1
