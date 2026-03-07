@@ -54,7 +54,7 @@ app.post('/search', upload.single('image'), async (req, res) => {
             .withFields(['image', 'text','_additional { distance }'])
             .withNearImage({ 
                 image: b64Image,
-                distance:0.25
+                distance:3
 
              })
             .withLimit(limit)
