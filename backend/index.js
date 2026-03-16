@@ -45,36 +45,55 @@ const ensureDatabasePopulated = async () => {
 app.post('/search', upload.single('image'), async (req, res) => {
     try {
         const b64Image = encodeImage(req.file.buffer);
-        const { page = 1 } = req.body; // Get the page number from the request body, default to 1
-        const limit = 3; // Number of images to return per page
-        const offset = (page - 1) * limit;
 
-        const result = await client.graphql.get()
+        const page       = Math.max(1, parseInt(req.body.page)  || 1);
+        const limit      = Math.max(1, parseInt(req.body.limit) || 6);
+        const distance   = parseFloat(req.body.distance)        || 0.75;
+        const offset     = (page - 1) * limit;
+
+        // ── 1. Get total count at this threshold (no offset, high limit) ──
+        const countResult = await client.graphql.get()
             .withClassName('ImageSearch')
-            .withFields(['image', 'text','_additional { distance }'])
-            .withNearImage({ 
-                image: b64Image,
-                distance:3
+            .withFields(['_additional { distance }'])
+            .withNearImage({ image: b64Image, distance })
+            .withLimit(1000)  // ceiling — raise if your DB is larger
+            .do();
 
-             })
+        const allMatches = countResult.data.Get.ImageSearch ?? [];
+        const total      = allMatches.length;
+
+        if (total === 0) {
+            return res.status(404).json({ message: 'No similar images found.' });
+        }
+
+        // ── 2. Fetch the actual page of results ──
+        const pageResult = await client.graphql.get()
+            .withClassName('ImageSearch')
+            .withFields(['image', 'text', '_additional { distance }'])
+            .withNearImage({ image: b64Image, distance })
             .withLimit(limit)
             .withOffset(offset)
             .do();
 
-        if (result.data.Get.ImageSearch.length === 0) {
-            return res.status(404).send('No similar images found.');
-        }
-        console.log(result.data.Get.ImageSearch[0])
-        const images = result.data.Get.ImageSearch.map(image => ({
-            image: image.image,
-            text: image.text,
-            distance:image._additional.distance,
+        const items = (pageResult.data.Get.ImageSearch ?? []).map(img => ({
+            image:    img.image,
+            text:     img.text,
+            distance: img._additional.distance,
         }));
 
-        res.json(images);
+        // ── 3. Return results + pagination metadata ──
+        res.json({
+            results:     items,
+            total,
+            page,
+            limit,
+            totalPages:  Math.ceil(total / limit),
+            distance,
+        });
+
     } catch (err) {
         console.error(err);
-        res.status(500).send('Internal Server Error');
+        res.status(500).json({ message: 'Internal Server Error' });
     }
 });
 
