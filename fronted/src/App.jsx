@@ -457,7 +457,7 @@ function AccuracySlider({ value, onChange }) {
 }
 
 /* ── ImageCard ── */
-function ImageCard({ result, index, onPreview }) {
+function ImageCard({ result, index, onPreview,show}) {
   const src = `data:image/jpeg;base64,${result.image}`;
   return (
     <div className="img-card" style={{ animationDelay: `${index * 60}ms` }}>
@@ -467,8 +467,8 @@ function ImageCard({ result, index, onPreview }) {
         <a href={src} download={`result-${index + 1}.jpg`} className="ov-btn save" style={{ textDecoration: 'none' }}>SAVE</a>
       </div>
       <div className="img-foot">
-        <span>{result.text?.slice(0, 18) || `IMG_${String(index + 1).padStart(3, '0')}`}</span>
-        <span className="dist-tag">{Number(result.distance).toFixed(3)}</span>
+        {show.filename && <span>{result.text?.slice(0, 18) || `IMG_${String(index + 1).padStart(3, '0')}`}</span>}
+        {show.scores && <span className="dist-tag">{Number(result.distance).toFixed(3)}</span>}
       </div>
     </div>
   );
@@ -537,6 +537,7 @@ export default function App() {
   const [previewModal, setPreviewModal] = useState(null);
   const [hasSearched, setHasSearched] = useState(false);
   const [totalPages, setTotalPages] = useState(0);
+  const [show,setShow] = useState({scores:true,filename:true})
   const PER_PAGE = 6;
 
   const handleFile = useCallback(async (file) => {
@@ -604,6 +605,13 @@ const currentPageResults = results;
   // const currentPageResults = results.slice((page - 1) * PER_PAGE, page * PER_PAGE);
   // If backend returns paginated results directly, use: const currentPageResults = results;
 
+const handleCheckboxChange = (e,label)=>{
+  console.log(e.target.checked,label)
+  switch(label){
+    case "Show filename labels":setShow(prev=>({...prev,filename:e.target.checked}))
+    case "Show distance scores":setShow(prev=>({...prev,scores:e.target.checked}))
+  }
+}
   return (
     <>
       <style>{GLOBAL_CSS}</style>
@@ -676,7 +684,7 @@ const currentPageResults = results;
                   'Show filename labels',
                 ].map((label) => (
                   <label key={label} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 9, color: 'var(--muted)', cursor: 'pointer', letterSpacing: 1 }}>
-                    <input type="checkbox" defaultChecked style={{ accentColor: 'var(--lime)', width: 12, height: 12 }} />
+                    <input type="checkbox" onChange={(event)=>handleCheckboxChange(event,label)} defaultChecked style={{ accentColor: 'var(--lime)', width: 12, height: 12 }} />
                     {label}
                   </label>
                 ))}
@@ -728,7 +736,7 @@ const currentPageResults = results;
                         </div>
                       ))
                     : currentPageResults.map((r, i) => (
-                        <ImageCard key={i} result={r} index={i} onPreview={setPreviewModal} />
+                        <ImageCard key={i} result={r} index={i} onPreview={setPreviewModal} show={show}/>
                       ))
                   }
                 </div>
