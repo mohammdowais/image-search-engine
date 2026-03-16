@@ -640,7 +640,7 @@ const handleCheckboxChange = (e,label)=>{
             <div>
               <div className="sec-label">Input source</div>
               <div className="tab-row">
-                {['file', 'webcam', 'url'].map((s) => (
+                {['file', ].map((s) => (  // 'url','webcam'
                   <button key={s} className={`tab ${source === s ? 'active' : ''}`}
                     onClick={() => { setSource(s); clearInput(); }}>
                     {s.toUpperCase()}
